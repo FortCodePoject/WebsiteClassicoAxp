@@ -2,6 +2,7 @@
 @section('title', 'Painel Administrativo')
 @section('content')
     @include('sbadmin.includes.sidebar')
+    <link rel="stylesheet" href="{{asset("css/home.css")}}">
     <!-- Content Wrapper -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -20,7 +21,7 @@
                   
                     <div class="text-center">
                         <h2>Bem vindo ao painel administrativo do seu site <span class="text-primary">{{auth()->user()->name}}</span></h2>
-                        <h5>Link de acesso do seu site para partilhar nas redes socias: <a target="_blank" href="http://127.0.0.1:8000/{{Str::lower(auth()->user()->company->companyhashtoken)}}">https://axp.fortcodedev.com/{{Str::lower(auth()->user()->company->companyhashtoken)}}</a></h5>
+                        <h5>Link de acesso do seu site para partilhar nas redes socias: <a target="_blank" href="https://axp.fortcodedev.com/{{Str::lower(auth()->user()->company->companyhashtoken)}}">https://axp.fortcodedev.com/{{Str::lower(auth()->user()->company->companyhashtoken)}}</a></h5>
                     </div>
 
                     <div class="col-xl-6">
@@ -177,4 +178,3 @@
     </div>
     <!-- End of Content Wrapper -->
 @endsection
-<link rel="stylesheet" href="{{asset("css/home.css")}}">
