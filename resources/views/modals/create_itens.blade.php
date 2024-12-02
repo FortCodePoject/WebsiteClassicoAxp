@@ -19,7 +19,7 @@
                   <h5 for="category_id" class="form-label">Categoria</h5>
                   <select class="form-control" wire:model="category_id">
                       <option>Selecione a categoria</option>
-                      @if (count($categories) > 0)
+                      @if (isset($categories) and count($categories) > 0)
                         @foreach ($categories as $category)
                             <option value="{{ $category['category'] ?? '' }}">{{ $category['category'] ?? '' }}</option>
                         @endforeach
