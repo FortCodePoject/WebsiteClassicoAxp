@@ -18,7 +18,7 @@
         }
         html,
         body {
-            width: 100%;
+        width: 100%;
         height: 100%;
         /* fallback for old browsers */
         background: #6a11cb;
