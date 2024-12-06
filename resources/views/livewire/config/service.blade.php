@@ -18,6 +18,7 @@
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary">{{ $editMode ? 'Atualizar' : 'Cadastrar' }}</button>
+            <a class="btn btn-primary mx-2" onclick="openTab(event, 'components')"> Proximo </a>
         </div>
     </form>
 

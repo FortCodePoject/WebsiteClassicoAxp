@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(company::class);
             $table->foreignIdFor(Termpb::class);
+            $table->enum("accept", ["yes", "no"])->default('no');
             $table->timestamps();
         });
     }

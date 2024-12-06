@@ -26,6 +26,7 @@
 
         <div class="form-group">
             <button type="submit" class="btn btn-primary">{{ $selectedComponentId ? 'Atualizar' : 'Adicionar' }}</button>
+            <a class="btn btn-primary mx-2" onclick="openTab(event, 'works')"> Proximo </a>
         </div>
     </form>
 

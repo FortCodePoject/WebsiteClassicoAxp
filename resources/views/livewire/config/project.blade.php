@@ -17,6 +17,7 @@
 
         <div class="form-group">
             <input type="submit" value="{{ $projectId ? 'Atualizar' : 'Adicionar' }}" class="btn btn-primary">
+            <a class="btn btn-primary mx-2" onclick="openTab(event, 'footer')"> Proximo </a>
         </div>
     </form>
 
