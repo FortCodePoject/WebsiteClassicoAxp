@@ -1,9 +1,5 @@
 @section("title", "Tela de Inscrição")
 <div class="col-md-12 d-flex justify-content-center align-items-center flex-wrap">
-    <div class="full-screen-loader" wire:loading wire:target="createAccountSite">
-        <div class="loader"></div>
-        <p>A sua Conta está a ser criada, aguarde...</p>
-    </div>
     
     <div class="card col-md-8 bg-dark text-white" id="signup">
         <div class="card-header text-center">
@@ -95,6 +91,7 @@
                                 @endforeach
                             </select>
                         @endif
+                        @error('mylocation')<span class="text-danger">{{$message}}</span>@enderror
                     </div>
                 </div>
 
@@ -108,6 +105,11 @@
         <div class="card-footer text-center">
             <p class="lead">Já tem uma conta? <a href="{{route('anuncio.login.view')}}" style="color: #ffffff !important;">Fazer Login.</a></p>
         </div>
+    </div>
+
+    <div class="full-screen-loader d-none" wire:loading.class="d-flex" wire:loading.class.remove="d-none" wire:loading wire:target="createAccountSite">
+        <div class="loader"></div>
+        <p>A sua conta está a ser criada, aguarde...</p>
     </div>
         
 </div>
