@@ -3,215 +3,161 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendEmail;
-use App\Models\{About, Color, contact, Fundo, hero, pacote, Service,
-    company as ModelsCompany, Habilidade, Project, Skill, Termo, Termpb_has_Company, TermsCompany, visitor};
+use App\Models\{
+    About, Color, Contact, Fundo, Hero, Pacote, Service, 
+    Company, Habilidade, Project, Skill, Termo, Termpb_has_Company, 
+    TermsCompany, Visitor
+};
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\{Hash, Http, Mail};
 use Jenssegers\Agent\Agent;
 
 class SiteController extends Controller
 {
-    //pegar a conta da empresa
-    public function getCompany($company)
+    // Obter os dados da empresa
+    private function getCompanyData($companyHash)
     {
-        return ModelsCompany::where('companyhashtoken', $company)->first();
+        return Company::where('companyhashtoken', $companyHash)->first();
     }
 
-    public function getVisitor($companyhash)
+    // Registrar visitante
+    public function registerVisitor($company)
     {
         try {
-            // Capturar informações da requisição
             $userAgent = request()->header('User-Agent');
-
-            // Usar a biblioteca Jenssegers/Agent para analisar o user agent
             $agent = new Agent();
             $agent->setUserAgent($userAgent);
 
-            //salvar os dados no banco
-            $visitors = new visitor();
+            Visitor::create([
+                'ip' => request()->ip(),
+                'browser' => $agent->browser(),
+                'system' => $agent->platform(),
+                'device' => $agent->device(),
+                'typedevice' => $agent->isDesktop() ? 'Computador' : ($agent->isPhone() ? 'Telefone' : 'Tablet'),
+                'company' => $company->companyname,
+            ]);
 
-            $visitors->ip = request()->ip();
-            $visitors->browser = $agent->browser();
-            $visitors->system = $agent->platform();
-            $visitors->device = $agent->device();
+        } catch (\Throwable $th) {
+            logger()->error('Erro ao registrar visitante: ' . $th->getMessage());
+        }
+    }
+
+    // Página inicial
+    public function index($companyHash)
+    {
+        try {
+            session()->forget("companyhashtoken");
             
-            if ($agent->isDesktop()) {
-                $visitors->typedevice = "Computador";
-            }if ($agent->isPhone()) {
-                $visitors->typedevice = "Telefone";
-            }if ($agent->isTablet()) {
-                $visitors->typedevice = "Tablet";
+            $company = $this->getCompanyData($companyHash);
+
+            if (!$company || $company->status !== 'active') {
+                return view('disable.App', compact('company'));
             }
-            
-            $visitors->company = $companyhash->companyname;
-            
-            $visitors->save();
+
+            // Coleta de dados
+            $this->registerVisitor($company);
+            $data = [
+                'clients' => Skill::where('elements', 'Clientes')->where('company_id', $company->id)->get(),
+                'works' => Skill::where('elements', 'Trabalhos')->where('company_id', $company->id)->get(),
+                'premios' => Skill::where('elements', 'Premios')->where('company_id', $company->id)->get(),
+                'experience' => Skill::where('elements', 'Experiência')->where('company_id', $company->id)->get(),
+                'contact' => Contact::where('company_id', $company->id)->get(),
+                'hero' => Hero::where('company_id', $company->id)->get(),
+                'skills' => Skill::where('company_id', $company->id)->get(),
+                'about' => About::where('company_id', $company->id)->get(),
+                'projects' => Project::where('company_id', $company->id)->get(),
+                'services' => Service::where('company_id', $company->id)->get(),
+                'color' => Color::where('company_id', $company->id)->first(),
+                'whatsApp' => Pacote::where('company_id', $company->id)->where('pacote', 'WhatsApp')->first(),
+                'shopping' => Pacote::where('company_id', $company->id)->where('pacote', 'Shopping')->first(),
+                'phonenumber' => Contact::where('company_id', $company->id)->first(),
+                'termsPb' => Termpb_has_Company::where('company_id', $company->id)->with('termsPBs')->first(),
+                'terms' => TermsCompany::where('company_id', $company->id)->select('term', 'privacity')->first(),
+                'habilitys' => Habilidade::where('company_id', $company->id)->get(),
+                'apiArray' => Http::post('http://karamba.ao/api/anuncios', [
+                    'key' => 'wRYBszkOguGJDioyqwxcKEliVptArhIPsNLwqrLAomsUGnLoho',
+                ])->json(),
+                'imageHero' => $this->getFundo($company, 'Hero'),
+                'start' => $this->getFundo($company, 'Start'),
+                'footer' => $this->getFundo($company, 'Footer'),
+                'shoppingImage' => $this->getFundo($company, 'Shopping'),
+                'shoppingCartImage' => $this->getFundo($company, 'ShoppingCart'),
+                'name' => $company->companyname,
+                'companyhashtoken' => $company->companyhashtoken,
+                'companynif' => $company->companynif
+            ];
+            session()->put('companyhashtoken', $companyHash);
+
+            return view('pages.home', $data);
+        } catch (\Throwable $th) {
+            logger()->error('Erro na página inicial: ' . $th->getMessage());
+            return redirect()->back();
+        }
+    }
+
+    // Obter fundo específico
+    private function getFundo($company, $tipo)
+    {
+        try {
+            return Fundo::where('tipo', $tipo)->where('company_id', $company->id)->first();
         } catch (\Throwable $th) {
             return redirect()->back();
         }
     }
 
-    public function index($company)
+    // Enviar email
+    public function sendEmail(Request $request)
     {
         try {
-            $data = $this->getCompany($company);
-            if ($data && $data->status === 'active') {
-                
-                $contact = Contact::where("company_id", $data->id)->get();
-                $skills = Skill::where("company_id", $data->id)->get();
-                $about = About::where("company_id", $data->id)->get();
-                $services = Service::where("company_id", $data->id)->get();
-                $projects = Project::where("company_id", $data->id)->get();
-                $name = ModelsCompany::where("companyhashtoken", $company)->first();
-                $clients = Skill::where("elements", "Clientes")
-                            ->where("company_id", $data->id)->get();
-                $works = Skill::where("elements", "Trabalhos")
-                            ->where("company_id", $data->id)->get();
-                $premios = Skill::where("elements", "Premios")
-                            ->where("company_id", $data->id)->get();
-                $experience = Skill::where("elements", "Experiência")
-                            ->where("company_id", $data->id)->get();
-                $hero = Hero::where("company_id", $data->id)->get();
-                $color = Color::where("company_id", $data->id)->first();
-        
-                $WhatsApp = Pacote::where("company_id", $data->id)->where("pacote", "WhatsApp")->first();
-                $packges = Pacote::where("company_id", $data->id)->where("pacote", "Shopping")->first();
-                $phonenumber = Contact::where("company_id", $data->id)->first();
-                $habilitys = Habilidade::where("company_id", $data->id)->get();
+            Mail::to('pachecobarrosodig3@gmail.com', 'Pacheco Barroso')
+            ->send(new SendEmail($request->only('name', 'email', 'subject', 'message')));
     
-                $api = Http::post("http://karamba.ao/api/anuncios", ["key" => "wRYBszkOguGJDioyqwxcKEliVptArhIPsNLwqrLAomsUGnLoho"]);
-                $apiArray = $api->json();
-    
-                $termsPb = Termpb_has_Company::where("company_id", $data->id)->with('termsPBs')->first();
-
-                $termos = TermsCompany::where("company_id", $data->id)
-                ->select("term", "privacity")->first();
-
-                $companyhash = ModelsCompany::where("companyhashtoken", $company)->first();
-                //capturar dados de acesso
-                $this->getVisitor($companyhash);
-                session()->put("companyhashtoken", $companyhash->companyhashtoken);
-                return view("pages.home", [
-                    "clients" => $clients, 
-                    "works" => $works, 
-                    "premios" => $premios, 
-                    "experience" => $experience, 
-                    "contact" => $contact, 
-                    "hero" => $hero, 
-                    "skills" => $skills, 
-                    "about" => $about,
-                    "projects" => $projects,
-                    "services" => $services,
-                    "name" => $name,
-                    "companies" => $termsPb,
-                    "color" => $color,
-                    "whatsApp" => $WhatsApp,
-                    "packges" => $packges,
-                    "phonenumber" => $phonenumber,
-                    "data" => $data,
-                    "termos" => $termos,
-                    "apiArray" => $apiArray,
-                    "habilitys" => $habilitys,
-                    "imageHero" => $this->imageHero($company),
-                    "start" => $this->start($company),
-                    "footer" => $this->footer($company),
-                    "shopping" => $this->imageShopping($company),
-                    "shoppingCart" => $this->imageShoppingCart($company)
-                ]);
-            } else {
-                $name = ModelsCompany::where("companyhashtoken", $company)->first();
-                return view("disable.App", compact("name"));
-            }
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-    }
-
-    public function imageHero($company){
-        $data = ModelsCompany::where("companyhashtoken", $company)->first();
-        $imageHero = Fundo::where("tipo", "Hero")
-        ->where("company_id", $data->id)->first();
-        return $imageHero;
-    }
-
-    public function imageShopping($company){
-        $data = ModelsCompany::where("companyhashtoken", $company)->first();
-        $imageHero = Fundo::where("tipo", "Shopping")
-        ->where("company_id", $data->id)->first();
-        return $imageHero;
-    }
-
-    public function imageShoppingCart($company){
-        $data = ModelsCompany::where("companyhashtoken", $company)->first();
-        $imageHero = Fundo::where("tipo", "ShoppingCart")
-        ->where("company_id", $data->id)->first();
-        return $imageHero;
-    }
-
-    public function start($company){
-        $data = ModelsCompany::where("companyhashtoken", $company)->first();
-        $start = Fundo::where("tipo", "Start")
-        ->where("company_id", $data->id)->first();
-        return $start;
-    }
-
-    public function footer($company){
-        $data = ModelsCompany::where("companyhashtoken", $company)->first();
-        $footer = Fundo::where("tipo", "Footer")
-        ->where("company_id", $data->id)->first();
-        return $footer;
-    }
-
-    public function sendEmail(Request $request){
-        Mail::to("pachecobarrosodig3@gmail.com", "Pacheco Barroso")->send(new SendEmail([
-            "name" => $request->name,
-            "email" => $request->email,
-            "subject" => $request->subject,
-            "message" => $request->message,
-            "from" => $request->email,
-    ]));
-       return redirect()->back();
-    }
-
-    public function senha(){
-        return Hash::make("superadmin");
-    }
-
-    public function getShopping()
-    {
-        try {
-            $company = $this->getCompany(session("companyhashtoken"));
-            $color = Color::where("company_id", $company->id)->first();
-            $packges = Pacote::where("company_id", $company->id)->where("pacote", "Shopping")->first();
-
-            return view("pages.shopping.home", 
-                [
-                    "name" => $company,
-                    "color" => $color,
-                    "packges" => $packges
-                ]
-            );
+            return redirect()->back();
         } catch (\Throwable $th) {
             return redirect()->back();
         }
     }
 
-    public function getShoppingcart()
+    // Gerar senha hash
+    public function senha()
+    {
+        return Hash::make('superadmin');
+    }
+
+    // Página de compras
+    public function getShopping($companyHash)
     {
         try {
-            //code...
-            $company = $this->getCompany(session("companyhashtoken"));
-            $color = Color::where("company_id", $company->id)->first();
-            $packges = Pacote::where("company_id", $company->id)->where("pacote", "Shopping")->first();
+            $company = $this->getCompanyData($companyHash);
+            session()->forget("companyhashtoken");
+            session()->put("companyhashtoken", $company->companyhashtoken);
+            return $this->getShoppingView('pages.shopping.home');
+        } catch (\Throwable $th) {
+            return redirect()->back();
+        }
+    }
 
-            return view("pages.shopping.shoppingcart", [
-                "color" => $color,
-                "name" => $company,
-                "packges" => $packges
+    // Carrinho de compras
+    public function getShoppingCart()
+    {
+        try {
+            return $this->getShoppingView('pages.shopping.shoppingcart');
+        } catch (\Throwable $th) {
+            return redirect()->back();
+        }
+    }
+
+    private function getShoppingView($view)
+    {
+        try {
+            $company = $this->getCompanyData(session('companyhashtoken'));
+            return view($view, [
+                'name' => $company,
+                'companyhashtoken' => $company->companyhashtoken,
+                'color' => Color::where('company_id', $company->id)->first(),
             ]);
         } catch (\Throwable $th) {
+            logger()->error('Erro ao carregar a página de compras: ' . $th->getMessage());
             return redirect()->back();
         }
     }

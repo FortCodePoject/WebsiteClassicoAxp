@@ -14,7 +14,7 @@
                     <select name="company_id" id="company" class="form-control">
                         <option selected disabled> Selecione uma empresa</option>
                         @foreach ($companies as $company)
-                            <option value="{{$company->id}}">{{$company->companyname}}</option>
+                            <option value="{{$company->id ?? ''}}">{{$company->companyname ?? ''}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -24,7 +24,7 @@
                     <select name="packgeid" id="pacote" class="form-control">
                         <option selected disabled>Selecione um elemento</option>
                         @foreach ($packges as $packge)
-                            <option value="{{$packge->id}}">{{$packge->packgename}}</option>
+                            <option value="{{$packge->id ?? ''}}">{{$packge->packgename ?? ''}}</option>
                         @endforeach
                     </select>
                 </div>

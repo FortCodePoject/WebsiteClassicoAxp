@@ -43,9 +43,9 @@
                                         <tbody>
                                             @foreach ($pacotes as $pacote)
                                                <tr>
-                                                    <td>{{$pacote->company->companyname}}</td>
-                                                    <td>{{$pacote->pacote}}</td>
-                                                    <td class=" text-capitalize">{{$pacote->status}}</td>
+                                                    <td>{{$pacote->company->companyname ?? ''}}</td>
+                                                    <td>{{$pacote->pacote ?? ''}}</td>
+                                                    <td class=" text-capitalize">{{$pacote->status ?? ''}}</td>
                                                     <td>
 
                                                         <!-- Button trigger modal -->
@@ -56,7 +56,7 @@
                                                               </svg>
                                                         </button>
 
-                                                        <div class="modal fade" id="staticBackdrop{{$pacote->id}}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                        <div class="modal fade" id="staticBackdrop{{$pacote->id ?? ''}}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                                             <div class="modal-dialog">
                                                               <div class="modal-content">
                                                                 <div class="modal-header">
@@ -70,12 +70,12 @@
                                                                         <input type="hidden" value="{{$pacote->id}}" name="id">
                                                                         <div class="form-group">
                                                                             <label class="form-label" for="company">Nome da Empresa</label>
-                                                                            <input class="form-control" type="text" value="{{$pacote->company->companyname}}" disabled>
+                                                                            <input class="form-control" type="text" value="{{$pacote->company->companyname ?? ''}}" disabled>
                                                                         </div>
                                                         
                                                                         <div class="form-group">
                                                                             <label class="form-label" for="pacote">Elementos Premium</label>
-                                                                            <input class="form-control" type="text" value="{{$pacote->pacote}}" disabled>
+                                                                            <input class="form-control" type="text" value="{{$pacote->pacote ?? ''}}" disabled>
                                                                         </div>
 
                                                                         <div class="form-group">
