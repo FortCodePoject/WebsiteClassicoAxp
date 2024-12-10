@@ -4,7 +4,7 @@
       <div class="modal-content">
           <div class="modal-header">
               <h1 class="modal-title fs-5" id="exampleModalLabel">
-                  Políticas da Entidade {{ optional($name)->companyname ?? 'Nome não informado' }} | NIF: {{ optional($name)->companynif ?? 'NIF não informado' }}
+                Políticas da Entidade {{ $name ?? 'Nome não informado' }} | NIF: {{ $companynif ?? 'NIF não informado' }}
               </h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>

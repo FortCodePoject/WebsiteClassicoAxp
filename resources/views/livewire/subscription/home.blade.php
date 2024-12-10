@@ -85,9 +85,9 @@
                         <label for="" class="form-label">Localização da sua Loja</label>
                         @if (isset($locationMap) and count($locationMap) > 0)
                             <select wire:model="mylocation" class="form-control selectLocation2" id="location-select">
-                                    <option value="">--Selecionar--</option>
+                                <option value="">--Selecionar--</option>
                                 @foreach ($locationMap as $locationValue)
-                                    <option value="{{ $locationValue['location'] }}">{{ $locationValue['location'] }}</option>
+                                    <option value="{{ $locationValue['location'] ?? "" }}">{{ $locationValue['location'] ?? "" }}</option>
                                 @endforeach
                             </select>
                         @endif
@@ -109,7 +109,7 @@
 
     <div class="full-screen-loader d-none" wire:loading.class="d-flex" wire:loading.class.remove="d-none" wire:loading wire:target="createAccountSite">
         <div class="loader"></div>
-        <p>A sua conta está a ser criada, aguarde...</p>
+        <p class="display-3 display-md-1 text-center">A sua conta está a ser criada, aguarde...</p>
     </div>
         
 </div>

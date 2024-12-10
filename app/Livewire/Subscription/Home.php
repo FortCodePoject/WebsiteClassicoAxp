@@ -30,7 +30,7 @@ class Home extends Component
         'municipality' => 'required|string|max:255',
         'address' => 'required|string|max:255',
         'phone' => 'required|regex:/^\d{9,15}$/',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif', // Máx 2MB
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif',
         'mylocation' => 'required|string|max:255',
     ];
     
@@ -67,8 +67,7 @@ class Home extends Component
     }
 
     public function createAccountSite()
-    {
-        
+    {  
         $this->validate($this->rules, $this->messages);
         DB::beginTransaction();
         
@@ -132,18 +131,18 @@ class Home extends Component
             ];
 
             // Chamada às APIs externas
-            $response = Http::withHeaders($this->getHeaders())
-            ->post("https://kytutes.com/api/create/company", $infoCompany)
-            ->json();
+            // $response = Http::withHeaders($this->getHeaders())
+            // ->post("https://kytutes.com/api/create/company", $infoCompany)
+            // ->json();
 
-            $xzeroResponse = Http::withHeaders($this->getHeaders())
-            ->post("https://xzero.ao/api/create/account", $infoXzero)
-            ->json();
+            // $xzeroResponse = Http::withHeaders($this->getHeaders())
+            // ->post("https://xzero.ao/api/create/account", $infoXzero)
+            // ->json();
 
             // Atualizar tokens da empresa
-            $company->companytokenapi = $response['token'] ?? null;
-            $company->token_xzero = $xzeroResponse['apiToken'] ?? null;
-            $company->update();
+            // $company->companytokenapi = $response['token'] ?? null;
+            // $company->token_xzero = $xzeroResponse['apiToken'] ?? null;
+            // $company->update();
 
             // Disparar evento Registered
             event(new Registered($user));
@@ -163,7 +162,6 @@ class Home extends Component
             ]);
         }
     }
-
 
     public function clearForm()
     {

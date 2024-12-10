@@ -1,5 +1,5 @@
 @extends("layouts.App")
-@section("title", "Portfolio Site - " . $name->companyname)
+@section("title", "Portfolio Site - " . $name)
 @section("content")
 @include("components.navbar")
 @include("components.images")

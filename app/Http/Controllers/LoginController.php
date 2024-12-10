@@ -13,20 +13,28 @@ class LoginController extends Controller
     }
 
     public function login(Request $request){
-        $credentials = $this->validate($request, [
-            "email" => ["required"],
-            "password" => ["required"]
-        ]);
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            if (Auth::user()-> role == "Administrador") {
-                return redirect()->route("admin.index");
-            }if (Auth::user()-> role == "SuperAdmin") {
-                return redirect()->route("super.admin.index");
+        try {
+            $credentials = $this->validate($request, [
+                "email" => ["required"],
+                "password" => ["required"]
+            ]);
+    
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+                if (Auth::user()->role == "Administrador") {
+                    if (Auth::user()->email_verified_at != null) {
+                        return redirect()->route("admin.index");
+                    }else{
+                        return redirect()->route("site.verify.email");
+                    }
+                }if (Auth::user()->role == "SuperAdmin") {
+                    return redirect()->route("super.admin.index");
+                }
+            }else{
+                return redirect()->back()->with('error', 'Credenciais Incorretas');
             }
-        }else{
-            return redirect()->back()->with('error', 'Credenciais Incorretas');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Falha ao realizar a operação');
         }
     }
 
