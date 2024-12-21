@@ -243,20 +243,7 @@ class Shoppingcart extends Component
         try {
             //Acesso a API com um token
             $items = [];
-            if (count(CartFacade::getContent()) > 0) {
-                foreach (CartFacade::getContent() as $key => $item) {
-                    array_push($items, [
-                        "price" => $item->price,
-                        "quantity" => $item->quantity,
-                        "description" => $item->item,
-                        "tax" => 0,
-                        "discount" => 0,
-                        "retension" => 0,
-                        "productType" => "Unidade",
-                        "exemption_code" => 0
-                    ]);
-                }
-            }
+
             //code...
             $response = Http::withHeaders([
                 'Accept' => 'application/json',

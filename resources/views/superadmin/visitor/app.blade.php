@@ -32,7 +32,7 @@
                             </div>
                             <!-- Card Body -->
                             <div class="card-body">
-                                @livewire("super-admin.visitor")
+                                {{-- @livewire("super-admin.visitor") --}}
                             </div>
                         </div>
                     </div>

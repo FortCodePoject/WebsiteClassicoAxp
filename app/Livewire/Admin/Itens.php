@@ -1,10 +1,9 @@
 <?php
 namespace App\Livewire\Admin;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
+use Illuminate\Support\Facades\{DB, Http};
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class Itens extends Component
@@ -38,19 +37,11 @@ class Itens extends Component
     {
         try {
             $response = Http::withHeaders($this->getToken())
-                ->get("https://kytutes.com/api/items")->json();
+            ->get("https://kytutes.com/api/items")->json();
 
             if ($response != null) {
                 return $response;
-            } else {
-                $this->alert('error', 'ERRO', [
-                    'text' => ' Conexão Internet Instavel',
-                    'toast' => false,
-                    'position' => 'center',
-                    'showConfirmButton' => true,
-                    'confirmButtonText' => 'OK'
-                ]);
-            }
+            } 
         } catch (\Throwable $th) {
             $this->alert('error', 'ERRO', [
                 'toast' => false,
@@ -66,7 +57,7 @@ class Itens extends Component
     {
         try {
             $response = Http::withHeaders($this->getToken())
-                ->get("https://kytutes.com/api/categories")->json();
+            ->get("https://kytutes.com/api/categories")->json();
 
             if ($response != null) {
                 return $response;
@@ -146,11 +137,12 @@ class Itens extends Component
         if ($existingItem) {
             // Carrega os dados do item no formulário
             $this->itemId = $existingItem['reference'];
-            $this->description = $existingItem['description'];
+            $this->description = $existingItem['name'];
+            $this->longdescription = $existingItem['description'];
             $this->price = $existingItem['price'];
             $this->qtd = $existingItem['quantity'];
             $this->category_id = $existingItem['category'];
-            $this->image = null; // Resetar imagem, pois não é carregada diretamente da API
+            $this->image = $existingItem['image'];
             $this->editing = true;
         } else {
             $this->alert('error', 'Item não encontrado!', [
@@ -200,7 +192,9 @@ class Itens extends Component
 
     public function updateItem()
     {
+            DB::beginTransaction();
         try {
+            
             $fileName = null;
             if ($this->image !== null && !is_string($this->image)) {
                 $fileName = rand(2000, 3000) . "." . $this->image->getClientOriginalExtension();
@@ -208,7 +202,6 @@ class Itens extends Component
             }            
 
             $infoItem = [
-                "id" => $this->itemId,
                 "iva" => 0,
                 "cost" => $this->cost ?? 0,
                 "price" => $this->price,
@@ -216,25 +209,28 @@ class Itens extends Component
                 "description" => $this->description,
                 "category" => $this->category_id,
                 "longDescription" => $this->longdescription,
-                "image" => $fileName
+                "image" => $fileName,
             ];
-
+            
             $response = Http::withHeaders($this->getToken())
-                ->put("https://kytutes.com/api/items", $infoItem)->json();
+            ->put("https://kytutes.com/api/items", [
+                "reference" => $this->itemId,
+                "item" => $infoItem
+            ])->json();
 
-                if ($response != null) {
-                    # code...
-                    dd($response);
-
-                    $this->alert('success', 'Item Cadastrado!', [
-                        'toast' => false,
-                        'position' => 'center',
-                        'showConfirmButton' => false,
-                        'confirmButtonText' => 'OK',
-                    ]);
-                }
+            if ($response != null) {
+                $this->alert('success', 'Item Actualizado!', [
+                    'toast' => false,
+                    'position' => 'center',
+                    'showConfirmButton' => false,
+                    'confirmButtonText' => 'OK',
+                ]);
+            }
+            
+            DB::commit();
 
         } catch (\Throwable $th) {
+            DB::rollBack();
             $this->alert('error', 'ERRO!', [
                 'toast' => false,
                 'position' => 'center',

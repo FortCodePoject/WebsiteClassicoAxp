@@ -46,7 +46,7 @@
                                                         wire:change="updateQuantity('{{ $item->name }}','{{ $item->id }}')"
                                                         type="text" wire:model="qtd.{{ $item->id }}"
                                                         wire:key="{{ $item->id }}" class="quantity-input"
-                                                        value="{{ $item->quantity }}" id="quantity">
+                                                        value="{{ $item->quantity }}" id="quantity" readonly/>
                                                     {{-- <button class="quantity-btn" wire:click="increaseQuantity('{{$item->name}}','{{$item->id}}')">+</button> --}}
                                                 </div>
                                             </td>

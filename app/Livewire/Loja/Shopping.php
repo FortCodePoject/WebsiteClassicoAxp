@@ -94,6 +94,21 @@ class Shopping extends Component
             $getItemCart = Http::withHeaders($this->getHeaders())
             ->get("https://kytutes.com/api/items?description=$itemid")
             ->json();
+
+            $itemReference = $getItemCart[0]["reference"];
+            
+            // Verifica se o item já está no carrinho
+            $cartItem = Cart::getContent()->firstWhere('id', $itemReference);
+
+            if ($cartItem && $cartItem->quantity >= 1) {
+                $this->alert('info', 'AVISO', [
+                    'toast' => false,
+                    'position' => 'center',
+                    'timer' => '3000',
+                    'text' => 'O item ' . $getItemCart[0]["name"] . ' já está no carrinho'
+                ]);
+                return;
+            }
         
             if ($getItemCart != null) {
                 # code...

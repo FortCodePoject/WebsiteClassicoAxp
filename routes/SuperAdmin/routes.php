@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\SuperAdmin\{DocumentationController, GenerateImageController, PacoteController, UserController, VisitorController};
 use App\Http\Controllers\SuperAdmin\{RegisterCompanyController, TermosController, SuperAdminController};
+use App\Livewire\SuperAdmin\Visitor;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware("auth")->prefix("/super/admin")->group(function(){
+Route::middleware("auth", "superadmin")->prefix("/super/admin")->group(function(){
+    
     Route::controller(SuperAdminController::class)->group(function(){
         Route::get("/inicial", "index")->name("super.admin.index");
         Route::get("/contas", "accountView")->name("super.admin.account.view");
@@ -44,4 +46,7 @@ Route::middleware("auth")->prefix("/super/admin")->group(function(){
     Route::controller(VisitorController::class)->group(function(){
         Route::get("/visitas", "index")->name("super.admin.visitor.index");
     });
+
+    Route::get("/metricas", Visitor::class)->name("super.metrics");
+
 });

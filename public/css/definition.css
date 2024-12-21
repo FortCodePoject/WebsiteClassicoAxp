@@ -183,4 +183,89 @@ input:checked + label {
   left: 7em;
   margin-top: 4px;
 }
-/* toggle-pill-color end */
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .toggle-pill-color input[type="checkbox"] + label {
+    width: 7em;
+  }
+  .toggle-pill-color input[type="checkbox"] + label:before {
+    width: 1em;
+    height: 1em;
+    left: 0.2em;
+  }
+  .toggle-pill-color input[type="checkbox"]:checked + label:before {
+    left: 5.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggle-pill-color input[type="checkbox"] + label {
+    width: 6em;
+  }
+  .toggle-pill-color input[type="checkbox"] + label:before {
+    width: 0.9em;
+    height: 0.9em;
+    left: 0.15em;
+  }
+  .toggle-pill-color input[type="checkbox"]:checked + label:before {
+    left: 4.8em;
+  }
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+  label {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  main {
+    width: 95%;
+    padding: 10px;
+  }
+
+  .toggle-pill-color input[type="checkbox"] + label {
+    width: 7em;
+  }
+
+  .toggle-pill-color input[type="checkbox"]:checked + label:before {
+    left: 5.5em;
+  }
+}
+
+@media (max-width: 576px) {
+  label {
+    font-size: 10px;
+    padding: 8px;
+  }
+
+  .toggle-pill-color input[type="checkbox"] + label {
+    width: 6em;
+  }
+
+  .toggle-pill-color input[type="checkbox"]:checked + label:before {
+    left: 4.5em;
+  }
+}
+
+@media (max-width: 400px) {
+  h1 {
+    font-size: 16px;
+    padding: 10px 0;
+  }
+
+  label {
+    font-size: 0;
+  }
+
+  label:before {
+    margin: 0;
+    font-size: 18px;
+  }
+
+  main {
+    padding: 10px;
+  }
+}
