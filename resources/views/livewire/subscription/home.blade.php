@@ -1,11 +1,12 @@
 @section("title", "Tela de Inscrição")
 <div class="col-md-12 d-flex justify-content-center align-items-center flex-wrap">
     
-    <div class="card col-md-8 bg-dark text-white" id="signup">
+    <div class="card col-md-8 bg-dark text-white mt-5" id="signup">
         <div class="card-header text-center">
             <h4 class="card-title">Crie aqui o seu Website Clássico</h4>
         </div>
-        <div class="card-body">
+        
+        <div class="card-body mt-5">
             <form wire:submit.prevent="createAccountSite">
 
                 <div class="row">

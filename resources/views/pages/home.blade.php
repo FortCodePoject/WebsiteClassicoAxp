@@ -58,8 +58,8 @@
                     <div class="col-sm-6 col-md-7">
                       <div class="about-info">
                         @foreach ($about as $item)
-                        <p><span class="title-s">Nome: </span> <span>{{$item->nome}}</span></p>
-                        <p><span class="title-s">Perfil: </span> <span>{{$item->perfil}}</span></p>
+                            <p><span class="title-s">Nome: </span> <span>{{$item->nome}}</span></p>
+                            <p><span class="title-s">Perfil: </span> <span>{{$item->perfil}}</span></p>
                         @endforeach
                         @foreach ($contact as $item) 
                             <p><span class="title-s">Email: </span> <span>{{$item->email}}</span></p>

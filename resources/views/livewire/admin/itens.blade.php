@@ -38,7 +38,8 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button class="btn btn-outline-primary" data-toggle="modal" data-target="#additem" wire:click="editItem('{{ $item['reference'] }}')">
+                                        <button class="btn btn-outline-primary" data-toggle="modal" data-target="#editItem">
+                                        {{-- <button class="btn btn-outline-primary" data-toggle="modal" data-target="#additem" wire:click="editItem('{{ $item['reference'] }}')"> --}}
                                             <i class="fa fa-pencil"></i>
                                         </button>
                                         <button class="btn btn-outline-danger" wire:click="deleteItem('{{ $item['reference'] }}')">
@@ -68,5 +69,6 @@
     </div>
     {{-- modal Start --}}
     @include("modals.create_itens")
+    @include("modals.edit_item")
     {{-- modal End --}}
 </div>

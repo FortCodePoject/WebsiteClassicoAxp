@@ -67,8 +67,8 @@
     </li>
 
     <!-- Nav Item - Pacotes Premium -->
-    <li class="nav-item {{(Route::current()->getName() == "super.admin.visitor.index") ? "bg-white" : ""}}">
-        <a class="nav-link {{(Route::current()->getName() == "super.admin.visitor.index") ? "text-primary" : ""}}" href="{{route("super.admin.visitor.index")}}">
+    <li class="nav-item {{(Route::current()->getName() == "super.metrics") ? "bg-white" : ""}}">
+        <a class="nav-link {{(Route::current()->getName() == "super.metrics") ? "text-primary" : ""}}" href="{{route("super.metrics")}}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Metricas</span>
         </a>

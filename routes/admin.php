@@ -115,7 +115,8 @@ Route::middleware("verified")->prefix("/admin/")->group(function(){
         Route::get("/lista/encomeda", "index")->name("plataform.portfolio.admin.delivery.list");
     });
 
-});
+    //visitantes
+})->middleware("auth", "administrador");
 
 Route::controller(LoginController::class)->group(function(){
     Route::get("/login/view", "loginview")->name("anuncio.login.view");

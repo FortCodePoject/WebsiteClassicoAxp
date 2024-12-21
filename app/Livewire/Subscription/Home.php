@@ -25,12 +25,12 @@ class Home extends Component
         'email' => 'required|email|unique:users,email|max:255',
         'password' => 'required|min:6|max:50',
         'confirmpassword' => 'required|same:password',
-        'companynif' => 'required|numeric|digits_between:9,14',
+        'companynif' => 'required',
         'province' => 'required|string|max:255',
         'municipality' => 'required|string|max:255',
         'address' => 'required|string|max:255',
         'phone' => 'required|regex:/^\d{9,15}$/',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif',
+        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240',
         'mylocation' => 'required|string|max:255',
     ];
     
@@ -46,8 +46,6 @@ class Home extends Component
         'confirmpassword.required' => 'A confirmação da senha é obrigatória.',
         'confirmpassword.same' => 'A confirmação da senha deve ser igual à senha.',
         'companynif.required' => 'O campo NIF é obrigatório.',
-        'companynif.numeric' => 'O NIF deve conter apenas números.',
-        'companynif.digits_between' => 'O NIF deve ter entre 9 e 14 dígitos.',
         'province.required' => 'O campo Província é obrigatório.',
         'municipality.required' => 'O campo Município é obrigatório.',
         'address.required' => 'O campo Endereço é obrigatório.',
@@ -56,6 +54,7 @@ class Home extends Component
         'image.required' => 'O envio de uma imagem é obrigatório.',
         'image.image' => 'O arquivo enviado deve ser uma imagem.',
         'image.mimes' => 'A imagem deve estar no formato jpeg, png, jpg ou gif.',
+        'image.max' => 'A imagem não pode ser maior do que 10MB.',
         'mylocation.required' => 'O campo Localização é obrigatório.',
     ];
     
@@ -131,18 +130,18 @@ class Home extends Component
             ];
 
             // Chamada às APIs externas
-            // $response = Http::withHeaders($this->getHeaders())
-            // ->post("https://kytutes.com/api/create/company", $infoCompany)
-            // ->json();
+            $response = Http::withHeaders($this->getHeaders())
+            ->post("https://kytutes.com/api/create/company", $infoCompany)
+            ->json();
 
-            // $xzeroResponse = Http::withHeaders($this->getHeaders())
-            // ->post("https://xzero.ao/api/create/account", $infoXzero)
-            // ->json();
+            $xzeroResponse = Http::withHeaders($this->getHeaders())
+            ->post("https://xzero.ao/api/create/account", $infoXzero)
+            ->json();
 
             // Atualizar tokens da empresa
-            // $company->companytokenapi = $response['token'] ?? null;
-            // $company->token_xzero = $xzeroResponse['apiToken'] ?? null;
-            // $company->update();
+            $company->companytokenapi = $response['token'] ?? null;
+            $company->token_xzero = $xzeroResponse['apiToken'] ?? null;
+            $company->update();
 
             // Disparar evento Registered
             event(new Registered($user));

@@ -9,9 +9,9 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            @if (isset($companies) and $companies->count() > 0)
+            @if (isset($termsPb) and $termsPb->count() > 0)
               <p style="text-align: justify">
-                {{ isset($companies->termsPBs->privacity) ? $companies->termsPBs->privacity : "" }}
+                {{ isset($termsPb->termsPBs->privacity) ? $termsPb->termsPBs->privacity : "" }}
               </p>
             @else
               <p style="text-align: justify">

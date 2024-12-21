@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\StatusSiteController;
 use App\Http\Controllers\SiteController;
 use App\Livewire\Loja\Deliverystatus;
-use App\Livewire\Site\DeliveryStatusComponent;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(SiteController::class)->group(function(){

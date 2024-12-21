@@ -10,18 +10,19 @@ use Livewire\WithPagination;
 class Visitor extends Component
 {
     use WithPagination;
-    public $visitors, $company, $moth, 
-    $companydados, $companyselect;
+    public $company, $moth, 
+    $companydados, $companyselect, $perPage = 8;
 
     public function mount()
     {
-        $this->visitors = ModelsVisitor::get();
         $this->company = company::get();
     }
 
     public function render()
     {
-        return view('livewire.super-admin.visitor');
+        return view('livewire.super-admin.visitor', [
+            "visitors" => ModelsVisitor::orderBy('created_at', 'desc')->paginate($this->perPage)
+        ])->layout('layouts.config.app');
     }
 
     public function getVisitorCompany()

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Mail\SendEmail;
 use App\Models\{
-    About, Color, Contact, Fundo, Hero, Pacote, Service, 
-    Company, Habilidade, Project, Skill, Termo, Termpb_has_Company, 
+    About, Color, contact, Fundo, Hero, Pacote, Service, 
+    company, Habilidade, Project, Skill, Termo, Termpb_has_Company, 
     TermsCompany, Visitor
 };
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{Hash, Http, Mail};
+use Illuminate\Support\Facades\{Cache, Hash, Http, Mail};
 use Jenssegers\Agent\Agent;
 
 class SiteController extends Controller
@@ -20,33 +20,12 @@ class SiteController extends Controller
         return Company::where('companyhashtoken', $companyHash)->first();
     }
 
-    // Registrar visitante
-    public function registerVisitor($company)
-    {
-        try {
-            $userAgent = request()->header('User-Agent');
-            $agent = new Agent();
-            $agent->setUserAgent($userAgent);
-
-            Visitor::create([
-                'ip' => request()->ip(),
-                'browser' => $agent->browser(),
-                'system' => $agent->platform(),
-                'device' => $agent->device(),
-                'typedevice' => $agent->isDesktop() ? 'Computador' : ($agent->isPhone() ? 'Telefone' : 'Tablet'),
-                'company' => $company->companyname,
-            ]);
-
-        } catch (\Throwable $th) {
-            logger()->error('Erro ao registrar visitante: ' . $th->getMessage());
-        }
-    }
-
     // Página inicial
     public function index($companyHash)
     {
         try {
             session()->forget("companyhashtoken");
+            Cache()->forget("company_token");
             
             $company = $this->getCompanyData($companyHash);
 
@@ -54,8 +33,20 @@ class SiteController extends Controller
                 return view('disable.App', compact('company'));
             }
 
-            // Coleta de dados
-            $this->registerVisitor($company);
+            //Coleta de dados
+            $userAgent = request()->header('User-Agent');
+            $agent = new Agent();
+            $agent->setUserAgent($userAgent);
+
+            visitor::create([
+                'ip' => request()->ip(),
+                'browser' => $agent->browser(),
+                'system' => $agent->platform(),
+                'device' => $agent->device(),
+                'typedevice' => $agent->isDesktop() ? 'Computador' : ($agent->isPhone() ? 'Telefone' : 'Tablet'),
+                'company' => $company->companyname,
+            ]);
+            
             $data = [
                 'clients' => Skill::where('elements', 'Clientes')->where('company_id', $company->id)->get(),
                 'works' => Skill::where('elements', 'Trabalhos')->where('company_id', $company->id)->get(),
@@ -72,7 +63,7 @@ class SiteController extends Controller
                 'shopping' => Pacote::where('company_id', $company->id)->where('pacote', 'Shopping')->first(),
                 'phonenumber' => Contact::where('company_id', $company->id)->first(),
                 'termsPb' => Termpb_has_Company::where('company_id', $company->id)->with('termsPBs')->first(),
-                'terms' => TermsCompany::where('company_id', $company->id)->select('term', 'privacity')->first(),
+                'termos' => TermsCompany::where('company_id', $company->id)->select('term', 'privacity')->first(),
                 'habilitys' => Habilidade::where('company_id', $company->id)->get(),
                 'apiArray' => Http::post('http://karamba.ao/api/anuncios', [
                     'key' => 'wRYBszkOguGJDioyqwxcKEliVptArhIPsNLwqrLAomsUGnLoho',
@@ -86,7 +77,9 @@ class SiteController extends Controller
                 'companyhashtoken' => $company->companyhashtoken,
                 'companynif' => $company->companynif
             ];
+
             session()->put('companyhashtoken', $companyHash);
+            Cache::put('company_token', $companyHash); 
 
             return view('pages.home', $data);
         } catch (\Throwable $th) {
@@ -129,6 +122,11 @@ class SiteController extends Controller
     {
         try {
             $company = $this->getCompanyData($companyHash);
+
+            if (!$company || $company->status !== 'active') {
+                return view('disable.App', compact('company'));
+            }
+            
             session()->forget("companyhashtoken");
             session()->put("companyhashtoken", $company->companyhashtoken);
             return $this->getShoppingView('pages.shopping.home');
